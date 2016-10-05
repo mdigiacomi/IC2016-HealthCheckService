@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppMonitoringService", "AppMonitoringService\AppMonitoringService.csproj", "{40523C90-626C-456E-B1EF-7A3007129162}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppMonitoringService.Tests", "AppMonitoringService.Tests\AppMonitoringService.Tests.csproj", "{D0E9B0B1-6199-482B-A6FE-8EFE5D8C3277}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{40523C90-626C-456E-B1EF-7A3007129162}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{40523C90-626C-456E-B1EF-7A3007129162}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{40523C90-626C-456E-B1EF-7A3007129162}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{40523C90-626C-456E-B1EF-7A3007129162}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D0E9B0B1-6199-482B-A6FE-8EFE5D8C3277}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0E9B0B1-6199-482B-A6FE-8EFE5D8C3277}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0E9B0B1-6199-482B-A6FE-8EFE5D8C3277}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0E9B0B1-6199-482B-A6FE-8EFE5D8C3277}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
