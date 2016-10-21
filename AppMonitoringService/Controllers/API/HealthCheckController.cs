@@ -12,6 +12,8 @@ using AppMonitoringService.App_Code;
 using System.Configuration;
 using Newtonsoft.Json;
 using ElasticSearchFacade.Models;
+using Microsoft.AspNet.SignalR;
+using ElasticSearchFacadeSevice.App_Code;
 
 namespace AppMonitoringService.Controllers.API
 {
@@ -21,6 +23,7 @@ namespace AppMonitoringService.Controllers.API
         string ESAPHealthURL = ConfigurationManager.AppSettings["ESAppHealthURL"];
         string AppInfo = ConfigurationManager.AppSettings["GetAppInfoEndpoint"];
         string UpdateAppInfo = ConfigurationManager.AppSettings["UpdateAppInfoEndpoint"];
+        IHubContext hubContext = GlobalHost.ConnectionManager.GetHubContext<StatusHub>();
 
         // GET: api/HealthCheck
         public string Get()
@@ -36,16 +39,15 @@ namespace AppMonitoringService.Controllers.API
 
                 foreach (appinfo app in Apps)
                 {
-                    Dictionary<string, string> HealthCheckURL = new Dictionary<string, string>();
 
-                    HealthCheckURL.Add(app.AppName, app.AppURL);
+                    filewriter.writelog(app.AppName +  ": Checking Service");
 
-                    List<HealthCheckModel> appstatus = Post(HealthCheckURL);
+                    DeleteObject deleteme = new DeleteObject();
 
-                    client = new RestClient(ESAPHealthURL + UpdateAppInfo);
-                    request = new RestRequest("", Method.PUT);
-                    request.AddBody(appstatus[0]);
-                    queryResult = client.Execute(request);
+                    deleteme.AppName = app.AppName;
+                    deleteme.AppUrl = app.AppURL;
+
+                    HealthCheckModel appstatus = Post(deleteme);
 
                 }
 
@@ -59,32 +61,34 @@ namespace AppMonitoringService.Controllers.API
         }
 
         // POST: api/HealthCheck
-        public List<HealthCheckModel> Post([FromBody]Dictionary<string, string> HealthCheckURLs)
+        public HealthCheckModel Post([FromBody] DeleteObject deleteme)
         {
             string res = "";
 
             HealthCheckModel hcm = new HealthCheckModel();
             List<HealthCheckModel> returnval = new List<HealthCheckModel>();
 
-            foreach (KeyValuePair<string,string> url in HealthCheckURLs)
+            var client = new RestClient(deleteme.AppUrl);
+            var request = new RestRequest("", Method.GET);
+            var queryResult = client.Execute(request);
+
+            hcm.AppName = deleteme.AppName;
+            hcm.AppUrl = deleteme.AppUrl;
+            hcm.TimeStamp = DateTime.Now;
+
+            hcm.Status = queryResult.StatusCode.ToString();
+
+            if(queryResult.StatusCode == 0)
             {
-                var client = new RestClient(url.Value);
-                var request = new RestRequest("", Method.GET);
-                var queryResult = client.Execute(request);
-
-                hcm.AppName = url.Key;
-                hcm.AppUrl = url.Value;
-                hcm.TimeStamp = DateTime.Now;
-                hcm.Status = queryResult.StatusCode.ToString();
-                if (JSONHelper.IsValidJson(queryResult.Content)) ;
-                hcm.Message = queryResult.Content;
-
-                ElasticSearch.LogHealthMetric(hcm);
-
-                returnval.Add(hcm);
+                hcm.Status = HttpStatusCode.ServiceUnavailable.ToString();
             }
 
-            return returnval;
+            if (JSONHelper.IsValidJson(queryResult.Content)) 
+                hcm.Message = queryResult.Content;
+
+            ElasticSearch.LogHealthMetric(hcm);
+
+            return hcm;
 
         }
     }
